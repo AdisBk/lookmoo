@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Lookmoo">
+<meta name="theme-color" content="#4caf7d">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Lookmoo Health 🐾</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g1:#f4fdf6;--g2:#e8faf0;--g3:#b6e8cc;--g4:#7dd4a8;
+  --gm:#4caf7d;--gd:#2d7a52;--gdk:#1a3d2b;
+  --text:#1a3d2b;--muted:#4a8a64;
+  --radius:20px;--radius-sm:12px;
+  --nav-h:64px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-t:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{height:100%;overflow:hidden}
+body{height:100%;background:var(--g1);font-family:'Quicksand',sans-serif;color:var(--text);overflow:hidden;display:flex;flex-direction:column}
+
+/* status bar area */
+.status-bar{height:var(--safe-t);background:var(--gm);flex-shrink:0}
+
+/* hero */
+.hero{background:var(--gm);padding:16px 20px 60px;position:relative;overflow:hidden;flex-shrink:0}
+.hero::before{content:'🐾';font-size:110px;position:absolute;right:-18px;top:-18px;opacity:0.10;transform:rotate(15deg);pointer-events:none}
+.hero-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.hero-title{font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.85);letter-spacing:0.5px;text-transform:uppercase}
+.sync-pill{font-size:10px;color:rgba(255,255,255,0.75);font-weight:700;background:rgba(255,255,255,0.15);padding:3px 10px;border-radius:20px}
+.hero-profile{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.avatar-ring{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.3);padding:3px;cursor:pointer;flex-shrink:0;position:relative}
+.avatar-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:26px;background:rgba(255,255,255,0.35)}
+.avatar-inner img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.avatar-cam{position:absolute;bottom:0;right:0;width:20px;height:20px;background:var(--gdk);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;border:2px solid white}
+.hero-name{font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:white;line-height:1.1}
+.hero-sub{font-size:11px;color:rgba(255,255,255,0.85);margin-top:2px;font-weight:600}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.hstat{background:rgba(255,255,255,0.2);border-radius:10px;padding:8px 4px;text-align:center}
+.hstat-val{font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;color:white;line-height:1}
+.hstat-lbl{font-size:8px;color:rgba(255,255,255,0.85);margin-top:2px;font-weight:600;line-height:1.2}
+
+/* scrollable content */
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;margin-top:-44px;position:relative;z-index:5;padding-bottom:calc(var(--nav-h) + var(--safe-b) + 16px)}
+
+/* pages */
+.page{display:none;padding:0 14px}.page.active{display:block}
+
+/* cards */
+.card{background:white;border-radius:var(--radius);padding:16px;margin-bottom:12px;border:1.5px solid var(--g3)}
+.card-title{font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;color:var(--gdk);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.section-label{font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;color:var(--gm);text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px 2px}
+
+/* form */
+.field{margin-bottom:10px}
+.field label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px}
+.field input,.field select,.field textarea{width:100%;padding:11px 13px;border:1.5px solid var(--g3);border-radius:var(--radius-sm);font-size:14px;font-family:'Quicksand',sans-serif;background:var(--g2);color:var(--text);font-weight:600;outline:none;-webkit-appearance:none}
+.field input:focus,.field select:focus{border-color:var(--gm)}
+.field textarea{resize:none;font-size:13px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{width:100%;padding:13px;border:none;border-radius:var(--radius-sm);font-size:14px;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;letter-spacing:0.3px;-webkit-appearance:none}
+.btn:active{opacity:0.85;transform:scale(0.98)}
+.btn-green{background:var(--gm);color:white}
+.btn-outline{background:var(--g2);color:var(--gdk);border:1.5px solid var(--g3)}
+
+/* info rows */
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px dashed var(--g3)}
+.info-row:last-child{border-bottom:none}
+.info-label{font-size:12px;color:var(--muted);font-weight:600}
+.info-val{font-size:13px;font-weight:700;color:var(--text);text-align:right;max-width:60%}
+
+/* badges */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-green{background:#dcfce7;color:#166534}
+.badge-yellow{background:#fef9c3;color:#854d0e}
+.badge-blue{background:#dbeafe;color:#1e40af}
+
+/* weight */
+.weight-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--g3)}
+.weight-row:last-child{border-bottom:none}
+.w-date{font-size:10px;color:var(--muted);font-weight:700;min-width:68px}
+.w-bar-wrap{flex:1;height:9px;background:var(--g2);border-radius:5px;overflow:hidden}
+.w-bar{height:100%;background:var(--gm);border-radius:5px}
+.w-val{font-size:12px;font-weight:800;color:var(--gd);min-width:46px;text-align:right}
+
+/* vaccine */
+.vac-row{padding:11px 0;border-bottom:1px dashed var(--g3)}
+.vac-row:last-child{border-bottom:none}
+.vac-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.vac-meta{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.vac-date{font-size:10px;color:var(--muted);font-weight:600}
+.mark-btn{padding:5px 12px;border:none;border-radius:20px;background:var(--g2);color:var(--gdk);font-size:11px;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif;margin-top:6px}
+
+/* photos */
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.photo-item{aspect-ratio:1;border-radius:var(--radius-sm);overflow:hidden;position:relative}
+.photo-item img{width:100%;height:100%;object-fit:cover}
+.photo-del{position:absolute;top:4px;right:4px;width:22px;height:22px;background:rgba(0,0,0,0.45);border-radius:50%;border:none;cursor:pointer;font-size:11px;color:white}
+.photo-add{aspect-ratio:1;border-radius:var(--radius-sm);background:var(--g2);border:2px dashed var(--g3);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px}
+.photo-add-icon{font-size:26px}
+.photo-add-txt{font-size:9px;color:var(--muted);font-weight:700}
+.profile-photo-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;padding:6px 0}
+.profile-photo-large{width:86px;height:86px;border-radius:50%;overflow:hidden;border:3px solid var(--g3);background:var(--g2);display:flex;align-items:center;justify-content:center;font-size:38px;cursor:pointer}
+.profile-photo-large img{width:100%;height:100%;object-fit:cover}
+
+/* notes */
+.note-item{padding:11px;background:var(--g2);border-radius:var(--radius-sm);margin-bottom:8px;border-left:3px solid var(--gm)}
+.note-date{font-size:10px;color:var(--muted);font-weight:700;margin-bottom:4px}
+.note-text{font-size:13px;color:var(--text);line-height:1.5;font-weight:500}
+
+/* empty */
+.empty{text-align:center;padding:22px 0;color:var(--muted);font-size:13px;font-weight:600}
+.empty-icon{font-size:36px;display:block;margin-bottom:6px}
+
+/* config */
+.config-note{background:#f0fdf4;border:1.5px solid var(--g3);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--gdk);line-height:1.6;font-weight:600;margin-bottom:12px}
+.sync-bar{background:white;border-radius:var(--radius-sm);padding:9px 12px;margin-bottom:12px;display:flex;align-items:center;gap:8px;border:1.5px solid var(--g3)}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--gm);flex-shrink:0}
+.sync-dot.warn{background:#f0a830}
+.sync-dot.err{background:#f87171}
+.sync-txt{font-size:11px;font-weight:700;color:var(--muted);flex:1}
+
+/* install banner */
+.install-banner{background:var(--gdk);color:white;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;flex-shrink:0;display:none}
+.install-btn{background:white;color:var(--gdk);border:none;border-radius:20px;padding:5px 14px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Quicksand',sans-serif}
+
+/* bottom nav */
+.bottom-nav{
+  background:white;
+  border-top:1px solid var(--g3);
+  display:flex;
+  padding:8px 0;
+  padding-bottom:calc(8px + var(--safe-b));
+  flex-shrink:0;
+  z-index:100;
+}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer;min-height:44px;justify-content:center}
+.nav-icon{font-size:22px;transition:transform 0.15s}
+.nav-label{font-size:8px;font-weight:700;color:var(--muted);letter-spacing:0.3px}
+.nav-item.active .nav-label{color:var(--gm)}
+.nav-item.active .nav-icon{transform:scale(1.15)}
+
+input[type=file]{display:none}
+</style>
+</head>
+<body>
+
+<div class="status-bar"></div>
+
+<div id="install-banner" class="install-banner">
+  <span>🐾 Add Lookmoo to Home Screen</span>
+  <button class="install-btn" id="install-btn">Install</button>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-top">
+    <div class="hero-title">🐾 Lookmoo Health</div>
+    <div class="sync-pill" id="sync-indicator">● Local</div>
+  </div>
+  <div class="hero-profile">
+    <div class="avatar-ring" onclick="document.getElementById('avatar-input').click()">
+      <div class="avatar-inner" id="main-avatar">🐾</div>
+      <div class="avatar-cam">📷</div>
+    </div>
+    <input type="file" id="avatar-input" accept="image/*" onchange="uploadAvatar(event)">
+    <div>
+      <div class="hero-name">น้องลูกหมู</div>
+      <div class="hero-sub">French Bulldog · <span id="age-txt">calculating...</span></div>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="hstat"><div class="hstat-val" id="hs-weight">1.9</div><div class="hstat-lbl">Weight kg</div></div>
+    <div class="hstat"><div class="hstat-val" id="hs-age">—</div><div class="hstat-lbl">Weeks old</div></div>
+    <div class="hstat"><div class="hstat-val" id="hs-vac">0/3</div><div class="hstat-lbl">Vaccines</div></div>
+    <div class="hstat"><div class="hstat-val" id="hs-photos">0</div><div class="hstat-lbl">Photos</div></div>
+  </div>
+</div>
+
+<!-- SCROLL AREA -->
+<div class="scroll-area">
+
+<div id="page-home" class="page active">
+  <div class="section-label">Profile</div>
+  <div class="card">
+    <div class="card-title"><span>📋</span> Lookmoo's info</div>
+    <div class="info-row"><span class="info-label">Name</span><span class="info-val">น้องลูกหมู</span></div>
+    <div class="info-row"><span class="info-label">Breed</span><span class="info-val">French Bulldog</span></div>
+    <div class="info-row"><span class="info-label">Birthday</span><span class="info-val">20 Mar 2026</span></div>
+    <div class="info-row"><span class="info-label">Gender</span><span class="info-val">🐾 Boy</span></div>
+    <div class="info-row"><span class="info-label">Color</span><span class="info-val">Cream / White</span></div>
+    <div class="info-row"><span class="info-label">Microchip</span><span class="info-val" id="p-chip">Not recorded</span></div>
+    <div class="info-row"><span class="info-label">Vet clinic</span><span class="info-val" id="p-vet">Not recorded</span></div>
+  </div>
+  <div class="section-label">Next vaccine</div>
+  <div class="card">
+    <div class="card-title"><span>💉</span> Upcoming</div>
+    <div id="next-vac-content"></div>
+  </div>
+  <div class="section-label">Edit details</div>
+  <div class="card">
+    <div class="card-title"><span>✏️</span> Update info</div>
+    <div class="field-row">
+      <div class="field"><label>Microchip</label><input type="text" id="inp-chip" placeholder="chip number" oninput="saveProfile()"></div>
+      <div class="field"><label>Vet clinic</label><input type="text" id="inp-vet" placeholder="clinic name" oninput="saveProfile()"></div>
+    </div>
+  </div>
+</div>
+
+<div id="page-weight" class="page">
+  <div class="section-label">Add record</div>
+  <div class="card">
+    <div class="card-title"><span>⚖️</span> New weight</div>
+    <div class="field-row">
+      <div class="field"><label>Date</label><input type="date" id="w-date"></div>
+      <div class="field"><label>Weight (kg)</label><input type="number" id="w-val" step="0.01" min="0" max="20" placeholder="1.90" inputmode="decimal"></div>
+    </div>
+    <button class="btn btn-green" onclick="addWeight()">🐾 Save weight</button>
+  </div>
+  <div class="section-label">History</div>
+  <div class="card">
+    <div class="card-title"><span>📈</span> Weight log</div>
+    <div id="weight-list"><div class="empty"><span class="empty-icon">⚖️</span>No records yet</div></div>
+  </div>
+</div>
+
+<div id="page-vac" class="page">
+  <div class="section-label">Schedule</div>
+  <div class="card">
+    <div class="card-title"><span>💉</span> Core vaccines</div>
+    <div id="vac-list"></div>
+  </div>
+  <div class="section-label">Add custom</div>
+  <div class="card">
+    <div class="card-title"><span>➕</span> Custom vaccine</div>
+    <div class="field-row">
+      <div class="field"><label>Name</label><input type="text" id="cv-name" placeholder="e.g. Bordetella"></div>
+      <div class="field"><label>Date given</label><input type="date" id="cv-date"></div>
+    </div>
+    <div class="field"><label>Notes</label><input type="text" id="cv-notes" placeholder="clinic, batch no."></div>
+    <button class="btn btn-green" onclick="addCustomVac()">💉 Save vaccine</button>
+  </div>
+  <div id="custom-vac-section" style="display:none">
+    <div class="section-label">Additional records</div>
+    <div class="card">
+      <div class="card-title"><span>📋</span> Custom vaccines</div>
+      <div id="custom-vac-list"></div>
+    </div>
+  </div>
+</div>
+
+<div id="page-photos" class="page">
+  <div class="section-label">Profile photo</div>
+  <div class="card">
+    <div class="card-title"><span>🐾</span> Change profile photo</div>
+    <div class="profile-photo-wrap">
+      <div class="profile-photo-large" id="profile-photo-large" onclick="document.getElementById('avatar-input2').click()">
+        <span id="profile-photo-inner">🐾</span>
+      </div>
+      <span style="font-size:11px;color:var(--muted);font-weight:600">Tap to change photo</span>
+      <input type="file" id="avatar-input2" accept="image/*" onchange="uploadAvatar(event)">
+    </div>
+  </div>
+  <div class="section-label">Gallery</div>
+  <div class="card">
+    <div class="card-title"><span>📸</span> Lookmoo photos</div>
+    <div class="photo-grid" id="photo-grid">
+      <div class="photo-add" onclick="document.getElementById('photo-input').click()">
+        <span class="photo-add-icon">📷</span><span class="photo-add-txt">Add photo</span>
+      </div>
+    </div>
+    <input type="file" id="photo-input" accept="image/*" multiple onchange="uploadPhotos(event)">
+  </div>
+</div>
+
+<div id="page-notes" class="page">
+  <div class="section-label">Add note</div>
+  <div class="card">
+    <div class="card-title"><span>📝</span> New note</div>
+    <div class="field-row">
+      <div class="field"><label>Date</label><input type="date" id="n-date"></div>
+      <div class="field"><label>Category</label>
+        <select id="n-cat">
+          <option>General</option><option>Vet visit</option>
+          <option>Medication</option><option>Behaviour</option><option>Grooming</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Note</label>
+      <textarea id="n-text" rows="3" placeholder="e.g. First vet visit — all clear!"></textarea>
+    </div>
+    <button class="btn btn-green" onclick="addNote()">🐾 Save note</button>
+  </div>
+  <div class="section-label">Health log</div>
+  <div class="card">
+    <div class="card-title"><span>📋</span> All notes</div>
+    <div id="notes-list"><div class="empty"><span class="empty-icon">📝</span>No notes yet</div></div>
+  </div>
+</div>
+
+<div id="page-settings" class="page">
+  <div class="section-label">Google Sheets sync</div>
+  <div class="card">
+    <div class="card-title"><span>🔗</span> Connect Google Sheets</div>
+    <div class="config-note">
+      1. สร้าง Google Spreadsheet ใหม่<br>
+      2. Extensions → Apps Script → วางโค้ด → Deploy<br>
+      3. Copy URL ใส่ด้านล่าง แล้วกด Test
+    </div>
+    <div id="sync-status-card" style="display:none;margin-bottom:10px">
+      <div class="sync-bar">
+        <div class="sync-dot" id="sync-dot"></div>
+        <span class="sync-txt" id="sync-txt">Not connected</span>
+      </div>
+    </div>
+    <div class="field"><label>Apps Script URL</label>
+      <input type="text" id="sheet-url" placeholder="https://script.google.com/macros/s/..." oninput="saveSettings()">
+    </div>
+    <button class="btn btn-green" onclick="testSync()" style="margin-bottom:8px">🔄 Test connection</button>
+    <button class="btn btn-outline" onclick="syncAll()">☁️ Sync all data</button>
+  </div>
+  <div class="section-label">App</div>
+  <div class="card">
+    <div class="card-title"><span>📱</span> Install as app</div>
+    <p style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:12px;line-height:1.6">
+      iOS: กด Share → "Add to Home Screen"<br>
+      Android: กด Menu → "Add to Home Screen"
+    </p>
+    <button class="btn btn-green" id="pwa-install-btn" style="display:none" onclick="installPWA()">📲 Install Lookmoo App</button>
+  </div>
+  <div class="section-label">Data</div>
+  <div class="card">
+    <div class="card-title"><span>💾</span> Backup</div>
+    <button class="btn btn-outline" onclick="exportData()" style="margin-bottom:8px">📥 Export JSON</button>
+    <button class="btn btn-outline" onclick="if(confirm('Clear all data?')){localStorage.clear();location.reload()}">🗑️ Clear data</button>
+  </div>
+</div>
+
+</div><!-- /scroll-area -->
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="showPage('home',this)">
+    <div class="nav-icon">🏠</div><div class="nav-label">HOME</div>
+  </div>
+  <div class="nav-item" onclick="showPage('weight',this)">
+    <div class="nav-icon">⚖️</div><div class="nav-label">WEIGHT</div>
+  </div>
+  <div class="nav-item" onclick="showPage('vac',this)">
+    <div class="nav-icon">💉</div><div class="nav-label">VACCINE</div>
+  </div>
+  <div class="nav-item" onclick="showPage('photos',this)">
+    <div class="nav-icon">📸</div><div class="nav-label">PHOTOS</div>
+  </div>
+  <div class="nav-item" onclick="showPage('notes',this)">
+    <div class="nav-icon">📝</div><div class="nav-label">NOTES</div>
+  </div>
+  <div class="nav-item" onclick="showPage('settings',this)">
+    <div class="nav-icon">⚙️</div><div class="nav-label">SETTINGS</div>
+  </div>
+</div>
+
+<script>
+const DOB=new Date('2026-03-20');
+const VAC=[
+  {name:'DHPPi (1st shot)',due:addDays(DOB,42),key:'v1'},
+  {name:'DHPPi + Rabies (2nd)',due:addDays(DOB,70),key:'v2'},
+  {name:'DHPPi (3rd shot)',due:addDays(DOB,98),key:'v3'},
+  {name:'Annual Booster',due:addDays(DOB,365),key:'v4'},
+];
+function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
+function ld(k,def){try{return JSON.parse(localStorage.getItem('lm4_'+k))||def;}catch(e){return def;}}
+function sd(k,v){try{localStorage.setItem('lm4_'+k,JSON.stringify(v));}catch(e){}}
+
+let weights=ld('weights',[{date:'2026-06-03',val:1.90}]);
+let vacDone=ld('vacdone',{});
+let customVacs=ld('customvacs',[]);
+let notes=ld('notes',[]);
+let profile=ld('profile',{chip:'',vet:''});
+let photos=ld('photos',[]);
+let avatarSrc=ld('avatar','');
+let sheetUrl=ld('sheeturl','');
+let deferredPrompt=null;
+
+// PWA install
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredPrompt=e;
+  document.getElementById('pwa-install-btn').style.display='block';
+  document.getElementById('install-banner').style.display='flex';
+});
+window.addEventListener('appinstalled',()=>{
+  document.getElementById('install-banner').style.display='none';
+  document.getElementById('pwa-install-btn').style.display='none';
+});
+function installPWA(){
+  if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null;});}
+}
+
+// Service worker
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+function showPage(name,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  el.classList.add('active');
+  document.querySelector('.scroll-area').scrollTop=0;
+}
+
+function getAge(){
+  const diff=new Date()-DOB;
+  const weeks=Math.floor(diff/(1000*60*60*24*7));
+  return{weeks,label:weeks<16?weeks+' weeks':Math.floor(diff/(1000*60*60*24*30))+' months'};
+}
+
+function renderAvatar(){
+  const h=document.getElementById('main-avatar');
+  const pi=document.getElementById('profile-photo-inner');
+  if(avatarSrc){
+    h.innerHTML=`<img src="${avatarSrc}" alt="Lookmoo">`;
+    if(pi) pi.outerHTML=`<img src="${avatarSrc}" style="width:100%;height:100%;object-fit:cover" id="profile-photo-inner" alt="Lookmoo">`;
+  } else {
+    h.innerHTML='🐾';
+    if(pi && pi.tagName==='IMG'){ const s=document.createElement('span'); s.id='profile-photo-inner'; s.textContent='🐾'; pi.replaceWith(s); }
+  }
+}
+
+function uploadAvatar(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{avatarSrc=ev.target.result;sd('avatar',avatarSrc);renderAvatar();};
+  r.readAsDataURL(f);
+}
+
+function uploadPhotos(e){
+  Array.from(e.target.files).forEach(f=>{
+    const r=new FileReader();
+    r.onload=ev=>{photos.push({src:ev.target.result,date:new Date().toISOString().split('T')[0]});sd('photos',photos);renderPhotos();renderHero();};
+    r.readAsDataURL(f);
+  });
+  e.target.value='';
+}
+function deletePhoto(i){photos.splice(i,1);sd('photos',photos);renderPhotos();renderHero();}
+function renderPhotos(){
+  const g=document.getElementById('photo-grid');
+  g.innerHTML=photos.map((p,i)=>`<div class="photo-item"><img src="${p.src}" alt="photo ${i+1}"><button class="photo-del" onclick="deletePhoto(${i})">✕</button></div>`).join('')
+    +`<div class="photo-add" onclick="document.getElementById('photo-input').click()"><span class="photo-add-icon">📷</span><span class="photo-add-txt">Add</span></div>`;
+}
+
+function renderHero(){
+  const age=getAge();
+  document.getElementById('age-txt').textContent=age.label+' old';
+  document.getElementById('hs-age').textContent=age.weeks;
+  document.getElementById('hs-weight').textContent=weights.length?weights[weights.length-1].val.toFixed(1):'—';
+  document.getElementById('hs-vac').textContent=VAC.filter(v=>vacDone[v.key]).length+'/3';
+  document.getElementById('hs-photos').textContent=photos.length;
+}
+
+function renderProfile(){
+  document.getElementById('p-chip').textContent=profile.chip||'Not recorded';
+  document.getElementById('p-vet').textContent=profile.vet||'Not recorded';
+  document.getElementById('inp-chip').value=profile.chip||'';
+  document.getElementById('inp-vet').value=profile.vet||'';
+  const next=VAC.find(v=>!vacDone[v.key]);
+  const nvc=document.getElementById('next-vac-content');
+  if(next){
+    const od=next.due<new Date();
+    nvc.innerHTML=`<div class="info-row"><span class="info-label">Vaccine</span><span class="info-val">${next.name}</span></div>
+      <div class="info-row"><span class="info-label">Due date</span><span class="info-val">${fmtDate(next.due)}</span></div>
+      <div style="margin-top:8px"><span class="badge ${od?'badge-yellow':'badge-blue'}">${od?'⚠️ Overdue':'📅 Upcoming'}</span></div>`;
+  } else {
+    nvc.innerHTML='<div class="empty"><span class="empty-icon">✅</span>All done!</div>';
+  }
+}
+function saveProfile(){
+  profile.chip=document.getElementById('inp-chip').value;
+  profile.vet=document.getElementById('inp-vet').value;
+  sd('profile',profile);renderProfile();
+}
+
+function addWeight(){
+  const d=document.getElementById('w-date').value;
+  const v=parseFloat(document.getElementById('w-val').value);
+  if(!d||isNaN(v)||v<=0)return;
+  weights.push({date:d,val:v});weights.sort((a,b)=>a.date.localeCompare(b.date));
+  sd('weights',weights);document.getElementById('w-date').value='';document.getElementById('w-val').value='';
+  renderWeights();renderHero();
+  if(sheetUrl)syncRow('weight',{date:d,val:v});
+}
+function renderWeights(){
+  const list=document.getElementById('weight-list');
+  if(!weights.length){list.innerHTML='<div class="empty"><span class="empty-icon">⚖️</span>No records yet</div>';return;}
+  const mx=Math.max(...weights.map(w=>w.val));
+  list.innerHTML=weights.slice().reverse().map(w=>`<div class="weight-row">
+    <span class="w-date">${fmtDate(w.date)}</span>
+    <div class="w-bar-wrap"><div class="w-bar" style="width:${Math.round((w.val/mx)*100)}%"></div></div>
+    <span class="w-val">${w.val.toFixed(2)} kg</span></div>`).join('');
+}
+
+function markVac(key){
+  vacDone[key]=new Date().toISOString().split('T')[0];
+  sd('vacdone',vacDone);renderVaccines();renderProfile();renderHero();
+  if(sheetUrl)syncRow('vaccine',{key,date:vacDone[key]});
+}
+function renderVaccines(){
+  const today=new Date();
+  document.getElementById('vac-list').innerHTML=VAC.map(v=>{
+    const done=vacDone[v.key],od=!done&&v.due<today;
+    const badge=done?`<span class="badge badge-green">✅ Done ${fmtDate(done)}</span>`
+      :od?`<span class="badge badge-yellow">⚠️ Overdue</span>`
+      :`<span class="badge badge-blue">📅 Upcoming</span>`;
+    const btn=done?'':`<div><button class="mark-btn" onclick="markVac('${v.key}')">Mark done ✓</button></div>`;
+    return`<div class="vac-row"><div class="vac-name">${v.name}</div>
+      <div class="vac-meta"><span class="vac-date">Due: ${fmtDate(v.due)}</span>${badge}</div>${btn}</div>`;
+  }).join('');
+  const csec=document.getElementById('custom-vac-section');
+  if(customVacs.length){
+    csec.style.display='block';
+    document.getElementById('custom-vac-list').innerHTML=customVacs.map(v=>`
+      <div class="vac-row"><div class="vac-name">${v.name}</div>
+      <div class="vac-meta"><span class="vac-date">${fmtDate(v.date)}</span><span class="badge badge-green">✅ Done</span></div>
+      ${v.notes?`<div style="font-size:10px;color:var(--muted);margin-top:3px">${v.notes}</div>`:''}</div>`).join('');
+  } else csec.style.display='none';
+}
+function addCustomVac(){
+  const n=document.getElementById('cv-name').value.trim(),d=document.getElementById('cv-date').value,nt=document.getElementById('cv-notes').value.trim();
+  if(!n||!d)return;
+  customVacs.push({name:n,date:d,notes:nt});sd('customvacs',customVacs);
+  document.getElementById('cv-name').value='';document.getElementById('cv-date').value='';document.getElementById('cv-notes').value='';
+  renderVaccines();
+}
+
+const CAT_E={General:'📋','Vet visit':'🏥',Medication:'💊',Behaviour:'🐾',Grooming:'✂️'};
+function addNote(){
+  const d=document.getElementById('n-date').value,c=document.getElementById('n-cat').value,t=document.getElementById('n-text').value.trim();
+  if(!d||!t)return;
+  notes.unshift({date:d,cat:c,text:t});sd('notes',notes);
+  document.getElementById('n-date').value='';document.getElementById('n-text').value='';
+  renderNotes();if(sheetUrl)syncRow('note',{date:d,cat:c,text:t});
+}
+function renderNotes(){
+  const list=document.getElementById('notes-list');
+  if(!notes.length){list.innerHTML='<div class="empty"><span class="empty-icon">📝</span>No notes yet</div>';return;}
+  list.innerHTML=notes.map(n=>`<div class="note-item">
+    <div class="note-date">${CAT_E[n.cat]||'📋'} ${n.cat} · ${fmtDate(n.date)}</div>
+    <div class="note-text">${n.text}</div></div>`).join('');
+}
+
+function saveSettings(){sheetUrl=document.getElementById('sheet-url').value.trim();sd('sheeturl',sheetUrl);updateSync(sheetUrl?'ok':'local');}
+function updateSync(s){
+  const ind=document.getElementById('sync-indicator');
+  const dot=document.getElementById('sync-dot'),txt=document.getElementById('sync-txt');
+  document.getElementById('sync-status-card').style.display='flex';
+  if(s==='ok'){ind.textContent='● Synced';dot.className='sync-dot';txt.textContent='Connected to Google Sheets';}
+  else if(s==='err'){ind.textContent='● Error';dot.className='sync-dot err';txt.textContent='Connection failed';}
+  else{ind.textContent='● Local';dot.className='sync-dot warn';txt.textContent='Not connected — saved locally';}
+}
+async function testSync(){
+  if(!sheetUrl){alert('Enter Apps Script URL first');return;}
+  try{const r=await fetch(sheetUrl+'?action=ping'),d=await r.json();updateSync(d.status==='ok'?'ok':'err');}
+  catch(e){updateSync('err');}
+}
+async function syncRow(type,data){if(!sheetUrl)return;try{await fetch(sheetUrl,{method:'POST',body:JSON.stringify({type,...data})});}catch(e){}}
+async function syncAll(){
+  if(!sheetUrl){alert('Enter Apps Script URL first');return;}
+  try{
+    const r=await fetch(sheetUrl,{method:'POST',body:JSON.stringify({type:'sync_all',weights,vacDone,customVacs,notes,profile:{...profile,gender:'Male'}})});
+    const d=await r.json();
+    if(d.status==='ok'){updateSync('ok');alert('Sync successful ✅');}else{updateSync('err');alert('Sync failed ❌');}
+  }catch(e){updateSync('err');alert('Connection error ❌');}
+}
+function exportData(){
+  const b=new Blob([JSON.stringify({weights,vacDone,customVacs,notes,profile:{...profile,gender:'Male'}},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='lookmoo-backup.json';a.click();
+}
+
+const t=new Date().toISOString().split('T')[0];
+['w-date','n-date','cv-date'].forEach(id=>document.getElementById(id).value=t);
+if(sheetUrl)document.getElementById('sheet-url').value=sheetUrl;
+renderAvatar();renderHero();renderProfile();renderWeights();renderVaccines();renderNotes();renderPhotos();
+if(sheetUrl)updateSync('ok');
+</script>
+</body>
+</html>
